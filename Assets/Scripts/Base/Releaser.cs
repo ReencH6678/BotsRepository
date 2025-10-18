@@ -8,7 +8,6 @@ public class Releaser : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent<Unit>(out Unit unit))
-            if(unit.HaveTargetItems == false)
                ItemsRelesased?.Invoke(unit.ReleaseItems(transform.position));
     }
 }

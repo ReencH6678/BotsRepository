@@ -14,7 +14,7 @@ public class Spawner<T> : MonoBehaviour where T : MonoBehaviour, IPoolable
     {
         _pool = new ObjectPool<T>(
             createFunc: () => Instantiate(_prefabe, GetRandomPosition(), Quaternion.identity),
-            actionOnGet: (obj) => ActionOnGet(obj),
+            actionOnGet: (obj) => Get(obj),
             actionOnRelease: (obj) => obj.gameObject.SetActive(false),
             actionOnDestroy: (obj) => Destroy(obj.gameObject),
             collectionCheck: true,
@@ -23,7 +23,7 @@ public class Spawner<T> : MonoBehaviour where T : MonoBehaviour, IPoolable
             );
     }
 
-    public virtual void ActionOnGet(T obj)
+    public virtual void Get(T obj)
     {
         obj.gameObject.transform.position = GetRandomPosition();
     }

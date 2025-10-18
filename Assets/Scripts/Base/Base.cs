@@ -21,11 +21,17 @@ public class Base : MonoBehaviour
 
     private void OnEnable()
     {
+        foreach (Unit unit in _units)
+            unit.ItemsCollected += UpdateCollectingItems;
+
         _itemFinder.Found += SetFoundItems;
     }
 
     private void OnDisable()
     {
+        foreach (Unit unit in _units)
+            unit.ItemsCollected -= UpdateCollectingItems;
+
         _itemFinder.Found -= SetFoundItems;
     }
 
@@ -66,5 +72,13 @@ public class Base : MonoBehaviour
         }
 
         unit.SetCollectItems(unitItems);
+    }
+
+    private void UpdateCollectingItems(List<Item> collectedItems)
+    {
+        foreach(Item item in collectedItems)
+        {
+            _collectingItems.Remove(item);
+        }
     }
 }

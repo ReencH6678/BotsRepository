@@ -4,7 +4,7 @@ using UnityEngine;
 public class ItemsSpawner : Spawner<Item>
 {
     [SerializeField] private float _spawnrate;
-    [SerializeField] protected BoxCollider _spawnArea;
+    [SerializeField] private BoxCollider _spawnArea;
 
     private bool _isOn = true;
 
@@ -24,10 +24,10 @@ public class ItemsSpawner : Spawner<Item>
         }
     }
 
-    public override void ActionOnGet(Item obj)
+    public override void Get(Item obj)
     {
         obj.DeactivationRequested += Release;
-        base.ActionOnGet(obj);
+        base.Get(obj);
     }
 
     public override void Release(IPoolable obj)

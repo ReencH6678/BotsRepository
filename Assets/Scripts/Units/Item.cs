@@ -8,6 +8,7 @@ public class Item : MonoBehaviour, IPoolable
 
     public void Relese()
     {
+        transform.SetParent(null);
         DeactivationRequested?.Invoke(this);
     }
 }

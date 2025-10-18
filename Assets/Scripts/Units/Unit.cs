@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(NavMeshAgent), typeof(Taker), typeof(Backpack))]
 [RequireComponent(typeof(Rigidbody))]
@@ -21,6 +22,8 @@ public class Unit : MonoBehaviour
     public bool HaveTargetItems => _targetItems.Count > 0;
 
     public bool IsWaiting { get; private set; }
+
+    public event UnityAction<List<Item>> ItemsCollected;
 
     private void Start()
     {
@@ -52,11 +55,13 @@ public class Unit : MonoBehaviour
             yield return MoveTo(item.transform.position);
         }
 
-        _targetItems.Clear();
 
         yield return MoveTo(releaser.position);
-        yield return MoveTo(GetWaitPoint(waitArea));
 
+        ItemsCollected?.Invoke(_targetItems);
+        _targetItems.Clear();
+
+        yield return MoveTo(GetWaitPoint(waitArea));
 
         IsWaiting = true;
     }

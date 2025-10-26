@@ -1,15 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Events;
 
 [RequireComponent(typeof(NavMeshAgent), typeof(Taker), typeof(Backpack))]
 [RequireComponent(typeof(Rigidbody))]
 public class Unit : MonoBehaviour
 {
-    [SerializeField] private GameObject _base;
-    [SerializeField] private float _reachDistance;
+    private const float DefoultReachDistance = 1;
+
+    [SerializeField] private float _itemReachDistance;
+    [SerializeField] private float _releaserReachDistance;
 
     private NavMeshAgent _mover;
     private Taker _taker;
@@ -19,11 +21,11 @@ public class Unit : MonoBehaviour
     private List<Item> _targetItems = new List<Item>();
 
     public int MaxItemCount => _backpack.MaxItemsCount;
-    public bool HaveTargetItems => _targetItems.Count > 0;
 
     public bool IsWaiting { get; private set; }
+    public bool IsRunning { get; private set; }
 
-    public event UnityAction<List<Item>> ItemsCollected;
+    public event Action<List<Item>> ItemsCollected;
 
     private void Start()
     {
@@ -45,32 +47,32 @@ public class Unit : MonoBehaviour
 
     public IEnumerator Collect(Transform releaser, BoxCollider waitArea)
     {
-        IsWaiting = false;
-
         for (int i = 0; i < _targetItems.Count; i++)
         {
             Item item = _targetItems[i];
 
             _taker.SetTargetItem(item);
-            yield return MoveTo(item.transform.position);
+            yield return MoveTo(item.transform.position, _itemReachDistance);
         }
 
 
-        yield return MoveTo(releaser.position);
+        yield return MoveTo(releaser.position, _releaserReachDistance);
 
         ItemsCollected?.Invoke(_targetItems);
         _targetItems.Clear();
 
         yield return MoveTo(GetWaitPoint(waitArea));
-
-        IsWaiting = true;
     }
 
-    public IEnumerator MoveTo(Vector3 target)
+    public IEnumerator MoveTo(Vector3 target, float reachDistance = DefoultReachDistance)
     {
+        IsWaiting = false;
+
         _mover.SetDestination(target);
 
-        yield return new WaitUntil(() => (transform.position - target).sqrMagnitude < _reachDistance);
+        yield return new WaitUntil(() => (transform.position - target).sqrMagnitude < reachDistance);
+
+        IsWaiting = true;
     }
 
     public int ReleaseItems(Vector3 releasePoint)
@@ -84,6 +86,6 @@ public class Unit : MonoBehaviour
     public Vector3 GetWaitPoint(BoxCollider waitArea)
     {
         Bounds bounds = waitArea.bounds;
-        return new Vector3(Random.Range(bounds.min.x, bounds.max.x), transform.position.y, Random.Range(bounds.min.z, bounds.max.z));
+        return new Vector3(UnityEngine.Random.Range(bounds.min.x, bounds.max.x), transform.position.y, UnityEngine.Random.Range(bounds.min.z, bounds.max.z));
     }
 }

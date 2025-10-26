@@ -23,6 +23,7 @@ public class Scanner : MonoBehaviour
 
         while (_isOn)
         {
+            yield return new WaitForFixedUpdate();
             Collider[] colliders = Physics.OverlapSphere(transform.position, _searchAreaRadius);
             List<Item> items = new List<Item>();
 
@@ -35,7 +36,17 @@ public class Scanner : MonoBehaviour
             if (items.Count > 0)
                 Found?.Invoke(items);
 
+            items.Clear();
             yield return waitForSeconds;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(0, 1, 0, 0.2f);
+        Gizmos.DrawSphere(transform.position, _searchAreaRadius);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, _searchAreaRadius);
+
     }
 }

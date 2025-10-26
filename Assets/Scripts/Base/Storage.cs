@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Releaser), typeof(StorageViewer))]
@@ -6,7 +7,9 @@ public class Storage : MonoBehaviour
     private Releaser _releaser;
     private StorageViewer _storageViewer;
 
-    private int _itemsCount;
+    public int ItemsCount { get; private set; }
+
+    public event Action<int> CountChanged;
 
     private void Awake()
     {
@@ -24,9 +27,15 @@ public class Storage : MonoBehaviour
         _releaser.ItemsRelesased -= AddItems;
     }
 
+    public void TakeItems(int count)
+    {
+        ItemsCount -= count;
+    }
+
     private void AddItems(int count)
     {
-        _itemsCount += count;
-        _storageViewer.UpdateCount(_itemsCount);
+        ItemsCount += count;
+        _storageViewer.UpdateCount(ItemsCount);
+        CountChanged?.Invoke(ItemsCount);
     }
 }
